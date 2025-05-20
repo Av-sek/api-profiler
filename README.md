@@ -1,5 +1,3 @@
----
-````markdown
 # Dev Pulse 🌀
 
 A plug-and-play Django middleware profiler that tracks API performance and SQL query usage — **no code changes required** in your existing Django app.
