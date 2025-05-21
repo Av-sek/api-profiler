@@ -17,7 +17,7 @@ class LogColors:
 class SqlLogging:
 
     @staticmethod
-    def format_sql_logs(raw_sql: str):
+    def format_sql_logs(raw_sql: str)-> str:
         SQL_KEYWORDS = ['SELECT', 'FROM', 'WHERE', 'JOIN', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN',
                     'ON', 'GROUP BY', 'ORDER BY', 'LIMIT', 'OFFSET', 'AND', 'OR', 'HAVING']
         sql = raw_sql.replace('"', '').replace(',', ', ')
@@ -26,7 +26,17 @@ class SqlLogging:
         return sql.strip()
 
     @staticmethod
-    def log_sql_queries(request, limit_sql_queries):
+    def log_sql_queries(request, limit_sql_queries)->str:
+        """
+        Format and return a summary of SQL queries for the current request.
+
+        Args:
+            request: The Django request object.
+            limit_sql_queries: The maximum number of queries to display.
+
+        Returns:
+            A formatted string summarizing the SQL queries, or None if no queries were executed.
+        """
         if (
             len(connection.queries) == 0
         ):
@@ -49,12 +59,10 @@ class SqlLogging:
             if time_taken * 1000 > int(cache.get_int("SQL_TIME_THRESHOLD_IN_MS", 1000)):
                 warning_msg = f"{LogColors.YELLOW}{LogColors.BOLD} ⚠️  "
             total_time += time_taken
-
-            if True:
-                formatted_sql = SqlLogging.format_sql_logs(raw_sql)
-                msg_parts.append(f"{LogColors.GREEN}[{idx:03}]{LogColors.RESET}")
-                msg_parts.append(f"{formatted_sql}")
-                msg_parts.append(f"{LogColors.CYAN}       {warning_msg} Time: {time_taken:.3f} sec{LogColors.RESET}\n")
+            formatted_sql = SqlLogging.format_sql_logs(raw_sql)
+            msg_parts.append(f"{LogColors.GREEN}[{idx:03}]{LogColors.RESET}")
+            msg_parts.append(f"{formatted_sql}")
+            msg_parts.append(f"{LogColors.CYAN}       {warning_msg} Time: {time_taken:.3f} sec{LogColors.RESET}\n")
 
         msg_parts.append(f"{LogColors.YELLOW}Total Execution Time: {total_time:.3f} sec{LogColors.RESET}")
         msg_parts.append(f"{LogColors.CYAN}{line_sep}{LogColors.RESET}\n")
