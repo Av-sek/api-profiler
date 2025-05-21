@@ -1,7 +1,7 @@
 import time
 
 from api_profiler.cache import cache
-from api_profiler.cache.cache_keys import CACHE_KEYS
+from api_profiler.cache.cache_keys import FLAGS
 from api_profiler.logging.logger import logger, silence_django_server_logs
 from api_profiler.logging.log_sql import SqlLogging
 # to persist the context variable across the request-response cycle
@@ -45,11 +45,11 @@ class Profiler:
         :return: A dictionary mapping cache keys to their corresponding functions
         """
         return {
-            CACHE_KEYS["PARAMS"]: self.show_params,
-            CACHE_KEYS["HEADERS"]: self.show_headers,
-            CACHE_KEYS["BODY"]: self.show_body,
-            CACHE_KEYS["SQL"]: self.show_sql_queries,
-            CACHE_KEYS["RESPONSE"]: self.show_response,
+            FLAGS["PARAMS"]: self.show_params,
+            FLAGS["HEADERS"]: self.show_headers,
+            FLAGS["BODY"]: self.show_body,
+            FLAGS["SQL"]: self.show_sql_queries,
+            FLAGS["RESPONSE"]: self.show_response,
             # Add other cache keys and their corresponding functions here
         }
         

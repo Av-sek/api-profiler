@@ -1,4 +1,6 @@
 from ast import parse
+from pyexpat import features
+from sre_parse import FLAGS
 import subprocess
 import os
 import argparse
@@ -6,7 +8,7 @@ import sys
 import logging
 
 from api_profiler.cache import cache
-from api_profiler.cache.cache_keys import CACHE_KEYS
+from api_profiler.cache.cache_keys import LIMIT_SQL_QUERIES
 from api_profiler.django_utils.discover_app import DiscoverApp
 
 
@@ -38,7 +40,7 @@ def set_cli_environment(commands):
     for command in commands:
         logging.info(f"Setting environment variable: API_PROFILER_{command.upper()}")
         cache.set(
-            CACHE_KEYS[command.upper()],
+            FLAGS[command.upper()],
             "True",
             None,
         )
@@ -48,7 +50,7 @@ def unset_cli_environment(commands):
     for command in commands:
         logging.info(f"Unsetting environment variable: API_PROFILER_{command.upper()}")
         cache.set(
-            CACHE_KEYS[command.upper()],
+            FLAGS[command.upper()],
             "False",
             0,
         )
@@ -56,18 +58,17 @@ def unset_cli_environment(commands):
 
 def main():
     """Entry point for the profiler CLI."""
-    toggles = ["sql", "headers", "params", "body", "response"]
     parser = argparse.ArgumentParser(prog="profile")
     parser.add_argument("-ap", "--addrport", type=int, default=8000)
     parser.add_argument(
         "--set",
-        choices=toggles,
+        choices=features,
         nargs="+",
         help="Set the profiler options. Available options: sql, headers, params, body, response, time, status",
     )
     parser.add_argument(
         "--unset",
-        choices=toggles,
+        choices=features,
         nargs="+",
         help="Unset the profiler options. Available options: sql, headers, params, body, response, time, status",
     )
@@ -88,6 +89,13 @@ def main():
         set_cli_environment(args.set)
     if args.unset:
         unset_cli_environment(args.unset)
+    if args.limit_sql_queries:
+        logging.info(f"Setting limit for SQL queries to: {args.limit_sql_queries}")
+        cache.set(
+            LIMIT_SQL_QUERIES,
+            str(args.limit_sql_queries),
+            None,
+        )
     if args.run:
         if not run_django_with_profiler(args.addrport, unknown):
             logging.error("Failed to run Django with profiler.")

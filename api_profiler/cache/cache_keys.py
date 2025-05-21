@@ -1,12 +1,12 @@
 def get_cache_key(key):
     return f"API_PROFILER_{key}"
 
-CACHE_KEYS = dict(
-    SQL=get_cache_key("SQL"),
-    HEADERS=get_cache_key("HEADERS"),
-    PARAMS=get_cache_key("PARAMS"),
-    BODY=get_cache_key("BODY"),
-    RESPONSE=get_cache_key("RESPONSE"),
-    TIME=get_cache_key("TIME"),
-    STATUS=get_cache_key("STATUS"),
-)
+FLAGS = dict()
+
+features = ["sql", "headers", "params", "body", "response", "response-headers"]
+
+for feature in features:
+    FLAGS[feature.upper()] = get_cache_key(feature.upper())
+
+
+LIMIT_SQL_QUERIES = get_cache_key("LIMIT_SQL_QUERIES")
