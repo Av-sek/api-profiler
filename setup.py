@@ -7,6 +7,7 @@ setup(
     include_package_data=True,
     install_requires=[
         "Django>=3.0", 
+        "diskcache"
     ],
     entry_points={
         "console_scripts": [

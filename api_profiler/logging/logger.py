@@ -1,7 +1,7 @@
 import logging
 import logging.config
 
-from api_profiler.utils.log_sql import LogColors
+from api_profiler.logging.log_sql import LogColors
 
 class LogColorsFormatter(logging.Formatter):
     COLORS = {
