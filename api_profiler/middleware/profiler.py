@@ -1,5 +1,7 @@
 import time
 
+from api_profiler.cache import cache
+from api_profiler.cache.cache_keys import CACHE_KEYS
 from api_profiler.utils.logger import logger, silence_django_server_logs
 from api_profiler.utils.log_sql import SqlLogging
 # to persist the context variable across the request-response cycle
@@ -24,8 +26,8 @@ class Profiler:
         response = self.get_response(request)
         
         try:
-            if True:
-                msg = SqlLogging.log_sql_queries(request)
+            if cache.get(CACHE_KEYS["SQL"]).lower() == 'true':
+                msg = SqlLogging.log_sql_queries(request, 10)
                 if msg:
                     self.logger.info(msg)
         except Exception as e:

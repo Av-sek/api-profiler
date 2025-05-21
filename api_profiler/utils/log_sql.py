@@ -23,7 +23,7 @@ class SqlLogging:
         return sql.strip()
 
     @staticmethod
-    def log_sql_queries(request):
+    def log_sql_queries(request, limit_sql_queries):
         if (
             len(connection.queries) == 0
         ):
@@ -38,6 +38,8 @@ class SqlLogging:
         msg_parts.append(f"{LogColors.YELLOW}Total    : {len(connection.queries)} queries{LogColors.RESET}")
 
         for idx, query in enumerate(connection.queries, start=1):
+            if idx > limit_sql_queries:
+                break
             raw_sql = query.get("sql", "")
             time_taken = float(query.get("time", 0))
             total_time += time_taken

@@ -1,6 +1,8 @@
 
 from pathlib import Path
 
+from api_profiler.utils.log_sql import LogColors
+
 
 class DiscoverApp:
     app_name = None
@@ -11,8 +13,9 @@ class DiscoverApp:
             if entry.is_dir() and (entry / "wsgi.py").exists():
                 cls.app_name =entry.name
                 return
-        raise RuntimeError("Could not locate project folder with wsgi.py, please run this script from the project root directory.")
-    
+        print(f"{LogColors.MAGENTA}ERROR {LogColors.RESET}:No Django app found in the current directory.")
+        exit(1)
+
     @classmethod
     def get_app_name(cls):
         if cls.app_name is None:
