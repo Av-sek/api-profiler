@@ -6,7 +6,7 @@ import sys
 
 from api_profiler.cache import cache
 from api_profiler.cache.cache_keys import CACHE_KEYS
-from api_profiler.discover_app import DiscoverApp
+from api_profiler.utils.discover_app import DiscoverApp
 from api_profiler.utils.log_sql import LogColors
 
 

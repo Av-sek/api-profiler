@@ -1,7 +1,7 @@
 from importlib import import_module
 import os
 
-from api_profiler.discover_app import DiscoverApp 
+from api_profiler.utils.discover_app import DiscoverApp 
 
 original_settings = os.environ.get("ORIGINAL_DJANGO_SETTINGS_MODULE")
 
