@@ -31,5 +31,14 @@ class CacheService:
         :return: The value from the cache or None if not found
         """
         return self.cache.get(key)
+    
+    def get_boolean(self, key:str)->bool:
+        """
+        Get a boolean value from the cache.
+        :param key: The key to get from the cache
+        :return: The boolean value from the cache or False if not found
+        """
+        value =self.get(key)
+        return value.lower() == "true" if value else False
 
 cache = CacheService()

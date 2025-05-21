@@ -56,9 +56,7 @@ def main():
         "headers",
         "params",
         "body",
-        "response",
-        "time",
-        "status",
+        "response"
     ]
     parser = argparse.ArgumentParser(prog="profile")
     parser.add_argument("-ap", "--addrport", type=int, default=8000)
