@@ -45,6 +45,7 @@ class SqlLogging:
                 break
             raw_sql = query.get("sql", "")
             time_taken = float(query.get("time", 0))
+            warning_msg = ""
             if time_taken * 1000 > int(cache.get_int("SQL_TIME_THRESHOLD_IN_MS", 1000)):
                 warning_msg = f"{LogColors.YELLOW}{LogColors.BOLD} ⚠️  "
             total_time += time_taken
