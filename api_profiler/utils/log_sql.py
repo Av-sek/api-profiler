@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.db import connection
 
+from api_profiler.cache import cache
+
 
 class LogColors:
     RESET = "\033[0m"
@@ -43,13 +45,15 @@ class SqlLogging:
                 break
             raw_sql = query.get("sql", "")
             time_taken = float(query.get("time", 0))
+            if time_taken * 1000 > int(cache.get_int("SQL_TIME_THRESHOLD_IN_MS", 1000)):
+                warning_msg = f"{LogColors.YELLOW}{LogColors.BOLD} ⚠️  "
             total_time += time_taken
 
             if True:
                 formatted_sql = SqlLogging.format_sql_logs(raw_sql)
                 msg_parts.append(f"{LogColors.GREEN}[{idx:03}]{LogColors.RESET}")
                 msg_parts.append(f"{formatted_sql}")
-                msg_parts.append(f"{LogColors.CYAN}       Time: {time_taken:.3f} sec{LogColors.RESET}\n")
+                msg_parts.append(f"{LogColors.CYAN}       {warning_msg} Time: {time_taken:.3f} sec{LogColors.RESET}\n")
 
         msg_parts.append(f"{LogColors.YELLOW}Total Execution Time: {total_time:.3f} sec{LogColors.RESET}")
         msg_parts.append(f"{LogColors.CYAN}{line_sep}{LogColors.RESET}\n")

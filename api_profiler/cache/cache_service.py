@@ -41,4 +41,13 @@ class CacheService:
         value =self.get(key)
         return value.lower() == "true" if value else False
 
+    def get_int(self, key:str, default=0)->int:
+        """
+        Get an integer value from the cache.
+        :param key: The key to get from the cache
+        :return: The integer value from the cache or 0 if not found
+        """
+        value = self.get(key)
+        return int(value) if value else default
+
 cache = CacheService()
