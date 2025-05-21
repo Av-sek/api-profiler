@@ -9,6 +9,7 @@ class LogColors:
     GREEN = "\033[92m"
     MAGENTA = "\033[95m"
     BOLD = "\033[1m"
+    RED= "\033[91m"
 
 
 class SqlLogging:
