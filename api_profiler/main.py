@@ -15,7 +15,7 @@ class App:
         self.parser = argparse.ArgumentParser(prog="profile")
         self.parser.description = "API Profiler CLI"
 
-    def run_django_with_profiler(self, port: int = 8000, unknown=()) -> bool:
+    def run_django_with_profiler(self,unknown:list[str]=()) -> bool:
         """Run Django server with profiler settings. Returns True on success, False on failure."""
         target_path = os.getcwd()
         app_name = DiscoverApp.get_app_name()
@@ -28,7 +28,7 @@ class App:
         env["DJANGO_SETTINGS_MODULE"] = "api_profiler.patch_settings"
 
         result = subprocess.run(
-            ["python", "manage.py", "runserver", str(port), *unknown],
+            ["python", "manage.py", "runserver", *unknown],
             cwd=target_path,
             text=True,
             stderr=subprocess.PIPE,
@@ -40,7 +40,7 @@ class App:
             return False
         return True
 
-    def set_cli_environment(self, commands):
+    def set_cli_environment(self, commands:list[str])-> None:
         for command in commands:
             logging.info(
                 f"Setting environment variable: API_PROFILER_{command.upper()}"
@@ -51,7 +51,7 @@ class App:
                 None,
             )
 
-    def unset_cli_environment(self, commands):
+    def unset_cli_environment(self, commands:list[str])-> None:
         for command in commands:
             logging.info(
                 f"Unsetting environment variable: API_PROFILER_{command.upper()}"
@@ -64,7 +64,6 @@ class App:
 
     def add_arguemnts(self) -> None:
         """Add arguments to the parser."""
-        self.parser.add_argument("-ap", "--addrport", type=int, default=8000)
         self.parser.add_argument(
             "--set",
             choices=features,
@@ -90,7 +89,7 @@ class App:
             nargs="?",
         )
 
-    def handle_argument(self, args, unknown_args):
+    def handle_argument(self, args, django_args)-> None:
         """
         Handle the command line arguments and set/unset the profiler options.
         """
@@ -106,21 +105,24 @@ class App:
                 None,
             )
         if args.run:
-            if not self.run_django_with_profiler(args.addrport, unknown_args):
+            if not self.run_django_with_profiler(django_args):
                 logging.error("Failed to run Django with profiler.")
-                self.self.parser.print_usage()
+                self.parser.print_usage()
                 sys.exit(1)
 
-    def main(self):
+    def main(self)-> None:
         """Entry point for the profiler CLI."""
         self.add_arguemnts()
-        args, unknown = self.parser.parse_known_args()
+        args, django_args = self.parser.parse_known_args()
         if not any([args.set, args.unset, args.run]):
             self.parser.print_usage()
             sys.exit(1)
-        self.handle_argument(args, unknown)
+        self.handle_argument(args, django_args)
 
 
-if __name__ == "__main__":
+def entry_point()-> None:
+    """
+    Entry point for the script.
+    """
     app = App()
     app.main()

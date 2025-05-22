@@ -11,7 +11,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "profile=api_profiler.main:main",
+            "profile=api_profiler.main:entry_point",
         ],
     },
     author="Your Name",
