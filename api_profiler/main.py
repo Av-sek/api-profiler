@@ -12,8 +12,15 @@ from api_profiler.logging.logger import logger
 class App:
 
     def __init__(self):
-        self.parser = argparse.ArgumentParser(prog="profile")
-        self.parser.description = "API Profiler CLI"
+        self.parser = argparse.ArgumentParser(
+            prog="profile",
+            description="API Profiler CLI for Django projects.\n"
+                        "Easily enable/disable profiling features for SQL, headers, params, body, and responses.\n"
+                        "Example usage:\n"
+                        "  profile --set sql headers --unset body\n"
+                        "  profile --limit-sql-queries 5",
+            formatter_class=argparse.RawTextHelpFormatter
+        )
 
     def run_django_with_profiler(self, unknown: list[str] = ()) -> bool:
         """Run Django server with profiler settings. Returns True on success, False on failure."""

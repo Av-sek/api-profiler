@@ -1,12 +1,11 @@
 import os
-from pathlib import Path
+import tempfile
 from typing import Any, Optional
 import diskcache as dc 
 class CacheService:
 
     def __init__(self):
-        cache_dir = Path(__file__).resolve().parent.parent
-        cache_dir = os.path.join(cache_dir, "cache_db")
+        cache_dir = os.path.join(tempfile.gettempdir(), "api_profiler_cache")
         if not os.path.exists(cache_dir):
             os.makedirs(cache_dir)
         self.cache = dc.Cache(cache_dir)
