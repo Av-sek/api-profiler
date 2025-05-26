@@ -46,12 +46,18 @@ class Profiler:
 
     def show_body(self, request, response=None)-> None:
         body = request.body.decode("utf-8")
-        self.logger.info(f"Body: {body}")
+        self.logger.info(f"Body: {body}\n Size: {len(body)} bytes")
 
     def show_response(self, request, response=None)-> None:
         if response:
-            self.logger.info(f"Response: {response.content.decode('utf-8')}")
+            self.logger.info(f"Response: {response.content.decode('utf-8')} \n Size: {len(response.content)} bytes")
 
+    def show_response_headers(self, request, response)-> None: 
+        if response:
+            headers = response.headers
+            msg = self.log_dict(headers)
+            self.logger.info(f"Response Headers:\n\t{msg}")
+    
     def get_cache_key_to_function(self)-> dict[str, callable]:
         """
         Get the cache key to function mapping.
@@ -63,6 +69,7 @@ class Profiler:
             FLAGS["BODY"]: self.show_body,
             FLAGS["SQL"]: self.show_sql_queries,
             FLAGS["RESPONSE"]: self.show_response,
+            FLAGS['RESPONSE-HEADERS']: self.show_response_headers
         }
 
     def __call__(self, request):

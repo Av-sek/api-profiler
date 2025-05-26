@@ -2,11 +2,11 @@ import subprocess
 import os
 import argparse
 import sys
-import logging
 
 from api_profiler.cache import cache, features, FLAGS
 from api_profiler.cache.cache_keys import LIMIT_SQL_QUERIES
 from api_profiler.django_utils.discover_app import DiscoverApp
+from api_profiler.logging.logger import logger
 
 
 class App:
@@ -15,7 +15,7 @@ class App:
         self.parser = argparse.ArgumentParser(prog="profile")
         self.parser.description = "API Profiler CLI"
 
-    def run_django_with_profiler(self,unknown:list[str]=()) -> bool:
+    def run_django_with_profiler(self, unknown: list[str] = ()) -> bool:
         """Run Django server with profiler settings. Returns True on success, False on failure."""
         target_path = os.getcwd()
         app_name = DiscoverApp.get_app_name()
@@ -36,14 +36,18 @@ class App:
         )
         if result.returncode != 0:
             stderr = result.stderr.strip()
-            logging.error(f"Error: {stderr}")
+            logger.error(f"Error: {stderr}")
             return False
         return True
 
-    def set_cli_environment(self, commands:list[str])-> None:
+    def set_cli_environment(self, commands: list[str]) -> None:
         for command in commands:
-            logging.info(
-                f"Setting environment variable: API_PROFILER_{command.upper()}"
+            if command == "all":
+                commands = FLAGS.keys()
+                self.set_cli_environment(commands)
+                return
+            logger.info(
+                f"Setting {command.upper()}"
             )
             cache.set(
                 FLAGS[command.upper()],
@@ -51,10 +55,14 @@ class App:
                 None,
             )
 
-    def unset_cli_environment(self, commands:list[str])-> None:
+    def unset_cli_environment(self, commands: list[str]) -> None:
         for command in commands:
-            logging.info(
-                f"Unsetting environment variable: API_PROFILER_{command.upper()}"
+            if command == "all":
+                commands = FLAGS.keys()
+                self.unset_cli_environment(commands)
+                return
+            logger.info(
+                f"Unsetting {command.upper()}"
             )
             cache.set(
                 FLAGS[command.upper()],
@@ -89,7 +97,7 @@ class App:
             nargs="?",
         )
 
-    def handle_argument(self, args, django_args)-> None:
+    def handle_argument(self, args, django_args) -> None:
         """
         Handle the command line arguments and set/unset the profiler options.
         """
@@ -98,7 +106,7 @@ class App:
         if args.unset:
             self.unset_cli_environment(args.unset)
         if args.limit_sql_queries:
-            logging.info(f"Setting limit for SQL queries to: {args.limit_sql_queries}")
+            logger.info(f"Setting limit for SQL queries to: {args.limit_sql_queries}")
             cache.set(
                 LIMIT_SQL_QUERIES,
                 str(args.limit_sql_queries),
@@ -106,11 +114,11 @@ class App:
             )
         if args.run:
             if not self.run_django_with_profiler(django_args):
-                logging.error("Failed to run Django with profiler.")
+                logger.error("Failed to run Django with profiler.")
                 self.parser.print_usage()
                 sys.exit(1)
 
-    def main(self)-> None:
+    def main(self) -> None:
         """Entry point for the profiler CLI."""
         self.add_arguemnts()
         args, django_args = self.parser.parse_known_args()
@@ -120,7 +128,7 @@ class App:
         self.handle_argument(args, django_args)
 
 
-def entry_point()-> None:
+def entry_point() -> None:
     """
     Entry point for the script.
     """

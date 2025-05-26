@@ -1,3 +1,4 @@
+from collections import defaultdict
 from django.conf import settings
 from django.db import connection
 
@@ -37,10 +38,9 @@ class SqlLogging:
         Returns:
             A formatted string summarizing the SQL queries, or None if no queries were executed.
         """
-        if (
-            len(connection.queries) == 0
-        ):
+        if not connection.queries:
             return
+
         total_time = 0.0
         line_sep = "-" * 80
         msg_parts = [f"\n{LogColors.CYAN}{line_sep}{LogColors.RESET}"]
@@ -50,19 +50,39 @@ class SqlLogging:
         msg_parts.append(f"{LogColors.YELLOW}Path     : {request.path_info}{LogColors.RESET}")
         msg_parts.append(f"{LogColors.YELLOW}Total    : {len(connection.queries)} queries{LogColors.RESET}")
 
-        for idx, query in enumerate(connection.queries, start=1):
+        # Grouping queries
+        query_map = defaultdict(list)
+        for q in connection.queries:
+            sql = q.get("sql", "").strip()
+            query_map[sql].append(float(q.get("time", 0)))
+
+        # Sorting by repetition count desc, then total time desc
+        sorted_queries = sorted(
+            query_map.items(),
+            key=lambda item: (-len(item[1]), -sum(item[1]))
+        )
+
+        # Display queries
+        for idx, (sql, times) in enumerate(sorted_queries, start=1):
             if idx > limit_sql_queries:
                 break
-            raw_sql = query.get("sql", "")
-            time_taken = float(query.get("time", 0))
+
+            count = len(times)
+            total_query_time = sum(times)
+            total_time += total_query_time
+
+            # Flag long queries
             warning_msg = ""
-            if time_taken * 1000 > int(cache.get_int("SQL_TIME_THRESHOLD_IN_MS", 1000)):
+            if total_query_time * 1000 > int(cache.get_int("SQL_TIME_THRESHOLD_IN_MS", 1000)):
                 warning_msg = f"{LogColors.YELLOW}{LogColors.BOLD} ⚠️  "
-            total_time += time_taken
-            formatted_sql = SqlLogging.format_sql_logs(raw_sql)
+
+            formatted_sql = SqlLogging.format_sql_logs(sql)
+
             msg_parts.append(f"{LogColors.GREEN}[{idx:03}]{LogColors.RESET}")
             msg_parts.append(f"{formatted_sql}")
-            msg_parts.append(f"{LogColors.CYAN}       {warning_msg} Time: {time_taken:.3f} sec{LogColors.RESET}\n")
+            msg_parts.append(
+                f"{LogColors.CYAN}       Repeated: {count}x | {warning_msg}Total Time: {total_query_time:.3f} sec{LogColors.RESET}\n"
+            )
 
         msg_parts.append(f"{LogColors.YELLOW}Total Execution Time: {total_time:.3f} sec{LogColors.RESET}")
         msg_parts.append(f"{LogColors.CYAN}{line_sep}{LogColors.RESET}\n")

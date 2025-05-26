@@ -24,7 +24,7 @@ LOGGING_CONFIG = {
     "formatters": {
         "default": {
             "()": LogColorsFormatter,
-            "format": "[%(levelname)s] %(asctime)s - %(message)s",
+            "format": "[%(levelname)s] %(asctime)s - %(message)s - %(exc_info)s",
         },
     },
     "handlers": {

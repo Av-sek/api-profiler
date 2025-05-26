@@ -3,10 +3,11 @@ def get_cache_key(key):
 
 FLAGS = dict()
 
-features = ["sql", "headers", "params", "body", "response", "response-headers"]
+features = ["sql", "headers", "params", "body", "response", "response-headers", 'all']
 
 for feature in features:
-    FLAGS[feature.upper()] = get_cache_key(feature.upper())
+    if feature != 'all':
+        FLAGS[feature.upper()] = get_cache_key(feature.upper())
 
 
 LIMIT_SQL_QUERIES = get_cache_key("LIMIT_SQL_QUERIES")

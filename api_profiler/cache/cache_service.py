@@ -6,7 +6,6 @@ class CacheService:
 
     def __init__(self):
         cache_dir = Path(__file__).resolve().parent.parent
-        print(f"Cache directory: {cache_dir}")
         cache_dir = os.path.join(cache_dir, "cache_db")
         if not os.path.exists(cache_dir):
             os.makedirs(cache_dir)
