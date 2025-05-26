@@ -1,7 +1,7 @@
 import logging
 import logging.config
 
-from api_profiler.utils.log_sql import LogColors
+from api_profiler.logging.log_sql import LogColors
 
 class LogColorsFormatter(logging.Formatter):
     COLORS = {
@@ -24,7 +24,7 @@ LOGGING_CONFIG = {
     "formatters": {
         "default": {
             "()": LogColorsFormatter,
-            "format": "[%(levelname)s] %(asctime)s - %(message)s",
+            "format": "[%(levelname)s] %(asctime)s - %(message)s - %(exc_info)s",
         },
     },
     "handlers": {
