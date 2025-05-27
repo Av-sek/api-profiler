@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="api_profiler",
-    version="0.1.1",
+    version="0.1.2",
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
@@ -19,10 +19,10 @@ setup(
     description="Django profiling middleware CLI tool",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/Av-sek/api_profiler",
+    url="https://github.com/Av-sek/api-profiler",
     project_urls={
-        "Source": "https://github.com/Av-sek/api_profiler",
-        "Tracker": "https://github.com/Av-sek/api_profiler/issues",
+        "Source": "https://github.com/Av-sek/api-profiler",
+        "Tracker": "https://github.com/Av-sek/api-profiler/issues",
     },
     python_requires=">=3.7",
     classifiers=[
