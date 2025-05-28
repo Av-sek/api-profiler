@@ -50,7 +50,6 @@ class App:
         return True
 
     def set_cli_environment(self, commands: list[str]) -> None:
-        print(commands)
         for command in commands:
             if command == "all":
                 commands = FLAGS.keys()
