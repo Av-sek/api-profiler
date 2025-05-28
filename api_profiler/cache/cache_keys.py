@@ -3,7 +3,7 @@ def get_cache_key(key):
 
 FLAGS = dict()
 
-features = ["sql", "headers", "params", "body", "response", "response-headers", 'all']
+features = ["sql", "headers", "params", "body","response", "response-body", "response-headers", 'all']
 
 for feature in features:
     if feature != 'all':

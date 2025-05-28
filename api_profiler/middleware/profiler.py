@@ -29,28 +29,39 @@ class Profiler:
         )
         return message
 
-    def show_sql_queries(self, request, response=None)-> None:
+    def show_sql_queries(self, request, response=None) -> None:
         msg: str = SqlLogging.log_sql_queries(request, cache.get_int(LIMIT_SQL_QUERIES, 10))
         if msg:
             self.logger.info(msg)
 
-    def show_headers(self, request, response=None)-> None:
+    def show_headers(self, request, response=None) -> None:
         headers = request.headers
         msg = self.log_dict(headers)
-        self.logger.info(f"Headers:\n\t{msg}")
+        self.logger.info(f"{LogColors.BOLD}{LogColors.YELLOW}Headers:{LogColors.RESET}\n\t{msg}")
 
-    def show_params(self, request, response=None)-> None:
+    def show_params(self, request, response=None) -> None:
         params = request.GET
         msg = self.log_dict(params)
-        self.logger.info(f"Params:\n\t{msg}")
+        self.logger.info(f"{LogColors.BOLD}{LogColors.CYAN}Params:{LogColors.RESET}\n\t{msg}")
 
-    def show_body(self, request, response=None)-> None:
+    def show_body(self, request, response=None) -> None:
         body = request.body.decode("utf-8")
-        self.logger.info(f"Body: {body}\n Size: {len(body)} bytes")
+        self.logger.info(f"{LogColors.BOLD}{LogColors.MAGENTA}Body:{LogColors.RESET} {body}\n{LogColors.YELLOW} Size: {len(body)} bytes{LogColors.RESET}")
 
-    def show_response(self, request, response=None)-> None:
+    def show_response_body(self, request, response=None) -> None:
         if response:
-            self.logger.info(f"Response: {response.content.decode('utf-8')} \n Size: {len(response.content)} bytes")
+            content = response.content.decode('utf-8')
+            self.logger.info(f"{LogColors.BOLD}{LogColors.GREEN}Response:{LogColors.RESET} {content}\n{LogColors.YELLOW} Size: {len(response.content)} bytes{LogColors.RESET}")
+
+    def show_response_stat(self, request, response=None) -> None:
+        if response:
+            bytes_len = len(response.content)
+            kb = bytes_len / 1024
+            mb = kb / 1024
+            self.logger.info(
+                f"{LogColors.BOLD}{LogColors.YELLOW}Response Size:{LogColors.RESET} {bytes_len} bytes ({kb:.2f} KB, {mb:.2f} MB) \n\t"
+                f"{LogColors.BOLD}{LogColors.CYAN}Response Status:{LogColors.RESET} {response.status_code}"
+            )
 
     def show_response_headers(self, request, response)-> None: 
         if response:
@@ -68,7 +79,8 @@ class Profiler:
             FLAGS["HEADERS"]: self.show_headers,
             FLAGS["BODY"]: self.show_body,
             FLAGS["SQL"]: self.show_sql_queries,
-            FLAGS["RESPONSE"]: self.show_response,
+            FLAGS["RESPONSE"]: self.show_response_stat,
+            FLAGS["RESPONSE-BODY"]: self.show_response_body,
             FLAGS['RESPONSE-HEADERS']: self.show_response_headers
         }
 
@@ -82,7 +94,7 @@ class Profiler:
                 if cache.get_boolean(key):
                     func(request, response)
         except Exception as e:
-            self.logger.error(f"Error logging SQL queries: {e}")
+            self.logger.error(f"Error logging SQL queries: {e}", exc_info=True)
         self.logger.info(
             f"Status: {response.status_code} Total time taken: {time.perf_counter() - start_time:.3f} seconds\n"
         )
