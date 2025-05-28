@@ -8,7 +8,7 @@ A plug-and-play Django middleware profiler that tracks API performance and SQL q
 - ✅ Logs detailed SQL queries executed per request.
 - ✅ Color-coded, structured, and readable output.
 - ✅ Works with existing Django projects out of the box.
-- ✅ Installs as a global CLI: `profile 8000`
+- ✅ Installs as a global CLI: `profile run`
 
 ---
 
@@ -36,6 +36,8 @@ Navigate to your Django project folder and run:
 profile --set all #set all metrics as active
 profile run  #run django server
 profile --unset all #deactivate all metrics
+profile --set sql response-headers
+profile --unset sql response-body
 ```
 
 This:
@@ -126,7 +128,7 @@ pip install dist/api_profiler-0.1.0-py3-none-any.whl
 Run it on any Django project:
 
 ```bash
-profile 8000
+profile run
 ```
 
 
