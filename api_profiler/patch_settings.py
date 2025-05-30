@@ -16,14 +16,11 @@ settings = import_module(original_settings)
 
 globals().update({k: getattr(settings, k) for k in dir(settings) if k.isupper()})
 
-
+"""
+    need to revert back to profiler patch settings in order to register middleware
+"""
+os.environ["DJANGO_SETTINGS_MODULE"]='api_profiler.patch_settings'
 #Inject middleware 
 middleware_path = "api_profiler.middleware.Profiler"
 if middleware_path not in MIDDLEWARE: # type: ignore
     MIDDLEWARE.append(middleware_path) # type: ignore
-
-from api_profiler.django_utils.discover_app import DiscoverApp 
-project_name = DiscoverApp.get_app_name()
-if not project_name:
-    raise RuntimeError("Run this script from the project root directory.")
-WSGI_APPLICATION = f"{project_name}.wsgi.application"
